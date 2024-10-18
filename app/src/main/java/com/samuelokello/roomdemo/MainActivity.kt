@@ -1,5 +1,6 @@
 package com.samuelokello.roomdemo
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,13 +27,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.samuelokello.roomdemo.ui.theme.RoomDemoTheme
+import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val userViewModel: UserViewModel by viewModels {
-        UserViewModelFactory(AppDatabase.getDatabaseInstance(this).userDao())
-    }
+    private val userViewModel: UserViewModel by viewModels()
 
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,7 +48,8 @@ class MainActivity : ComponentActivity() {
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = {
-                                userViewModel.addUser(User(firstName = "Samuel", lastName = "Okello"))
+                                userViewModel.addUser(User(firstName = "Samuel", lastName = "Okello",
+                                    registractionDate = LocalDate.now() ))
                             }
                         ) {
                             Text("Add User")
@@ -69,6 +74,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("NewApi")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UsersListScreen(
@@ -91,6 +97,15 @@ fun UsersListScreen(
                 Text(
                     modifier = Modifier.fillMaxWidth().padding(4.dp),
                     text = "Name: ${user.firstName} ${user.lastName}",
+                )
+
+
+                val formarter = DateTimeFormatter.ISO_DATE
+                val date = formarter.format(user.registractionDate)
+
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(4.dp),
+                    text = date,
                 )
 
                 IconButton(onClick = {
